@@ -1,0 +1,47 @@
+plugins {
+	id 'org.springframework.boot' version '2.4.0'
+	id 'io.spring.dependency-management' version '1.0.10.RELEASE'
+	id 'java'
+	id 'com.palantir.docker' version '0.25.0'
+}
+
+group = 'com.andrei'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '8'
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-amqp'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.apache.commons:commons-lang3'
+	implementation 'org.flywaydb:flyway-core'
+	compile 'org.projectlombok:lombok:1.18.4'
+	compile 'org.postgresql:postgresql:42.2.1'
+	annotationProcessor 'org.projectlombok:lombok'
+	
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.amqp:spring-rabbit-test'
+	testImplementation 'org.assertj:assertj-core'
+}
+
+test {
+	exclude '**/*'
+	useJUnitPlatform()
+}
+
+docker {
+	dependsOn build
+	name "${project.name}"
+	files bootJar.archivePath
+	buildArgs(['JAR_FILE': "${bootJar.archiveName}"])
+}
